@@ -3,119 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neighborhood Turret Defense - Modular Arsenal</title>
+  <title>Stardew Farm Defender - C.A.T.S. Robot Workshop</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- Fullscreen Immersive Canvas -->
   <canvas id="game-canvas"></canvas>
 
-  <!-- In-Game Floating Tactical HUD -->
+  <!-- In-Game Floating Stardew HUD -->
   <div id="in-game-hud">
-    <div class="hud-panel hud-top-left">
-      <div class="hud-bar-group">
-        <div class="hud-bar-label">
-          <span>🏡 HOUSE INTEGRITY</span>
-          <span id="hud-house-text">500/500</span>
+    <div class="stardew-hud-card hud-bars-col">
+      <div class="bar-row">
+        <div class="bar-label">
+          <span>🌟 ANCIENT SUN CORE</span>
+          <span id="hud-core-text">800 / 800</span>
         </div>
-        <div class="progress-track">
-          <div id="hud-house-bar" class="progress-fill fill-house" style="width: 100%;"></div>
+        <div class="custom-track">
+          <div id="hud-core-bar" class="custom-fill fill-core" style="width: 100%;"></div>
         </div>
       </div>
 
-      <div class="hud-bar-group">
-        <div class="hud-bar-label">
-          <span>🛡️ TURRET INTEGRITY</span>
-          <span id="hud-turret-text">200/200</span>
+      <div class="bar-row">
+        <div class="bar-label">
+          <span>🤖 ROBOT HULL</span>
+          <span id="hud-robot-text">300 / 300</span>
         </div>
-        <div class="progress-track">
-          <div id="hud-turret-bar" class="progress-fill fill-turret" style="width: 100%;"></div>
+        <div class="custom-track">
+          <div id="hud-robot-bar" class="custom-fill fill-robot" style="width: 100%;"></div>
         </div>
       </div>
     </div>
 
-    <div class="hud-panel hud-center">
-      <div class="wave-title" id="hud-wave-title">WAVE 1</div>
-      <div class="wave-sub" id="hud-monsters-left">Infected Remaining: 8</div>
-    </div>
-
-    <div class="hud-panel hud-right">
-      <div class="credit-badge" id="hud-credits-val">$150</div>
-      <div class="survivors-badge">Survivors: <span id="hud-survivors">👨‍👩‍👦</span></div>
+    <div class="stardew-hud-card hud-center-title">
+      <div class="hud-wave-num" id="hud-wave-title">WAVE 1</div>
+      <div class="hud-wave-status" id="hud-monsters-left">Forest Monsters Left: 8</div>
     </div>
   </div>
 
-  <!-- CATS-Styled Modular Garage Workshop Overlay -->
-  <div id="garage-overlay">
-    <div class="garage-container">
-      <div class="garage-header">
-        <div class="garage-title-wrap">
-          <h1>TURRET ENGINEERING WORKBENCH</h1>
-          <p>Assemble your modular combat platform. Balance Energy budget against firepower.</p>
-        </div>
-        <div class="nav-tabs">
-          <button id="tab-assembly-btn" class="tab-btn active">🔧 Chassis & Assembly</button>
-          <button id="tab-shop-btn" class="tab-btn">🛒 Military Armory</button>
+  <!-- 3-CHOICE ROGUELITE SUPPLY CRATE DRAFT MODAL -->
+  <div id="draft-modal" class="hidden">
+    <div class="draft-box">
+      <div class="draft-header">
+        <h2 id="draft-wave-title">WAVE 1 REWARD: SELECT 1 SUPPLY CRATE</h2>
+        <p>Choose a new weapon or gadget module to add to your robot inventory.</p>
+      </div>
+
+      <div id="draft-cards-container" class="draft-cards-row">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- CATS VISUAL ROBOT WORKBENCH MODAL -->
+  <div id="workbench-modal" class="hidden">
+    <div class="wb-shell">
+      <div class="wb-header">
+        <div>
+          <h1>ROBOT ENGINEERING WORKBENCH</h1>
+          <p>Mount weapons & auxiliary gadgets on your chassis. Match power grid limits.</p>
         </div>
       </div>
 
-      <!-- Live Dynamic Stats Bar -->
-      <div id="garage-stats-bar">
-        <!-- Injected dynamically via JS -->
+      <!-- Live Dynamic Power & Stats Pill Bar -->
+      <div id="wb-stats-bar">
+        <!-- Injected via JS -->
       </div>
 
-      <!-- Assembly Tab Section -->
-      <div id="sec-assembly" class="workbench-grid">
-        <!-- Column 1: Chassis Platforms -->
-        <div class="panel-card">
-          <h3>1. Select Chassis</h3>
-          <div id="chassis-list" class="scroll-container">
-            <!-- Injected dynamically via JS -->
+      <!-- 3-Column CATS Workshop Workspace -->
+      <div class="wb-grid">
+        <!-- Col 1: Chassis Selection -->
+        <div class="wb-col">
+          <h3>1. Robot Chassis</h3>
+          <div class="scroll-area">
+            <button class="btn-chassis-select active" data-chassis="classic">
+              <div class="chassis-btn-name">Classic Wedge</div>
+              <div class="chassis-btn-meta">⚡ 12 Power | ❤️ 300 HP | 3 Sockets</div>
+            </button>
+            <button class="btn-chassis-select" data-chassis="titan">
+              <div class="chassis-btn-name">Titan Harvester</div>
+              <div class="chassis-btn-meta">⚡ 16 Power | ❤️ 600 HP | 4 Sockets</div>
+            </button>
+            <button class="btn-chassis-select" data-chassis="sneaky">
+              <div class="chassis-btn-name">Sneaky Rover</div>
+              <div class="chassis-btn-meta">⚡ 14 Power | ❤️ 220 HP | 3 Sockets</div>
+            </button>
           </div>
         </div>
 
-        <!-- Column 2: Interactive Sockets Blueprint -->
-        <div class="panel-card">
-          <h3>2. Modular Socket Mounts</h3>
-          <div id="turret-sockets-view" class="sockets-grid">
-            <!-- Injected dynamically via JS -->
+        <!-- Col 2: Live Blueprint & Sockets -->
+        <div class="wb-col">
+          <h3>2. Interactive Mount Sockets</h3>
+          <div class="blueprint-wrapper">
+            <canvas id="wb-blueprint-canvas" width="480" height="200"></canvas>
+            <div id="wb-sockets-list" class="sockets-list-scroll">
+              <!-- Injected via JS -->
+            </div>
           </div>
         </div>
 
-        <!-- Column 3: Warehouse Parts Inventory -->
-        <div class="panel-card">
+        <!-- Col 3: Warehouse Inventory -->
+        <div class="wb-col">
           <h3>3. Parts Warehouse</h3>
-          <div id="inventory-parts-list" class="scroll-container">
-            <!-- Injected dynamically via JS -->
+          <div id="wb-inventory-list" class="scroll-area">
+            <!-- Injected via JS -->
           </div>
         </div>
       </div>
 
-      <!-- Armory Shop Tab Section (Initially hidden) -->
-      <div id="sec-shop" class="workbench-grid hidden" style="grid-template-columns: 1fr;">
-        <div class="panel-card">
-          <h3>Military Hardware Procurement</h3>
-          <div id="armory-shop-list" class="scroll-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;">
-            <!-- Injected dynamically via JS -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Garage Footer -->
-      <div class="garage-footer">
-        <button id="btn-launch-wave" class="btn-launch btn-launch-ready">
-          Deploy Turret ➔ Wave 1
+      <!-- Workbench Footer -->
+      <div class="wb-footer">
+        <button id="btn-deploy-robot" class="btn-deploy btn-deploy-ready">
+          Deploy Robot (Start Wave 1) ➔
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Game Over Screen Overlay -->
-  <div id="gameover-overlay" class="hidden">
+  <!-- Game Over Screen Modal -->
+  <div id="gameover-modal" class="hidden">
     <div class="gameover-box">
-      <h1>DEFENSE FAILED</h1>
-      <p>The neighborhood was breached and the infected overwhelmed the house.</p>
-      <button id="btn-restart" class="btn-restart">Rebuild & Try Again</button>
+      <h1>ANCIENT CORE DESTROYED</h1>
+      <p>The wilderness monsters breached the farm defenses.</p>
+      <button id="btn-restart" class="btn-restart">Rebuild & Defend Again</button>
     </div>
   </div>
 

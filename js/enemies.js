@@ -1,163 +1,119 @@
-// Infected & Monster Classes with Smooth 2D Vector Visuals
-import { SmoothParticle, SmoothFloatingText, ExplosionShockwave } from './effects.js';
-
-export class AcidSpit {
-  constructor(x, y, vx, vy, damage = 15) {
-    this.x = x;
-    this.y = y;
-    this.vx = vx;
-    this.vy = vy;
-    this.damage = damage;
-    this.radius = 6;
-    this.life = 90;
-  }
-
-  update(particles) {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.vy += 0.05; // slight gravity
-    this.life--;
-
-    if (Math.random() < 0.5) {
-      particles.push(new SmoothParticle(
-        this.x, this.y,
-        (Math.random() - 0.5) * 1.5,
-        (Math.random() - 0.5) * 1.5,
-        '#84cc16',
-        3,
-        15
-      ));
-    }
-  }
-
-  draw(ctx) {
-    ctx.save();
-    ctx.fillStyle = '#84cc16';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#facc15';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius * 0.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-}
+// Stardew Valley Wilderness Monsters & Forest Slimes
+import { SmoothParticle, SmoothFloatingText } from './effects.js';
 
 export class Monster {
-  constructor(x, y, type = 'runner') {
+  constructor(x, y, type = 'slime') {
     this.x = x;
     this.y = y;
-    this.type = type;
-    this.slowTimer = 0;
-    this.attackCooldown = 0;
+    this.type = type; // 'slime', 'bat', 'bug', 'golem', 'king_slime'
+    this.vx = 0;
+    this.vy = 0;
     this.hurtTimer = 0;
-    this.animProgress = Math.random() * Math.PI * 2;
+    this.animTimer = Math.random() * Math.PI * 2;
 
-    if (type === 'runner') {
-      this.radius = 14;
-      this.maxHp = 45;
-      this.hp = 45;
-      this.baseSpeed = 2.4;
-      this.damage = 10;
-      this.bounty = 20;
-      this.color = '#ef4444';
-      this.darkColor = '#991b1b';
-    } else if (type === 'spitter') {
+    if (type === 'slime') {
       this.radius = 16;
-      this.maxHp = 70;
-      this.hp = 70;
-      this.baseSpeed = 1.4;
+      this.maxHp = 50;
+      this.hp = 50;
+      this.speed = 1.8;
+      this.damage = 12;
+      this.color = '#22c55e';
+      this.darkColor = '#15803d';
+    } else if (type === 'bat') {
+      this.radius = 14;
+      this.maxHp = 35;
+      this.hp = 35;
+      this.speed = 2.8;
+      this.damage = 10;
+      this.color = '#7e22ce';
+      this.darkColor = '#581c87';
+    } else if (type === 'bug') {
+      this.radius = 18;
+      this.maxHp = 90;
+      this.hp = 90;
+      this.speed = 1.5;
       this.damage = 18;
-      this.bounty = 35;
-      this.color = '#84cc16';
-      this.darkColor = '#4d7c0f';
-      this.shootCooldown = 90;
-    } else if (type === 'brute') {
-      this.radius = 26;
-      this.maxHp = 260;
-      this.hp = 260;
-      this.baseSpeed = 0.9;
-      this.damage = 32;
-      this.bounty = 80;
-      this.color = '#8b5cf6';
-      this.darkColor = '#5b21b6';
-    } else if (type === 'boss') {
-      this.radius = 42;
-      this.maxHp = 1200;
-      this.hp = 1200;
-      this.baseSpeed = 0.65;
-      this.damage = 60;
-      this.bounty = 350;
-      this.color = '#e11d48';
-      this.darkColor = '#881337';
-      this.shootCooldown = 60;
+      this.color = '#d97706';
+      this.darkColor = '#78350f';
+    } else if (type === 'golem') {
+      this.radius = 28;
+      this.maxHp = 320;
+      this.hp = 320;
+      this.speed = 0.9;
+      this.damage = 35;
+      this.color = '#64748b';
+      this.darkColor = '#334155';
+    } else if (type === 'king_slime') {
+      this.radius = 48;
+      this.maxHp = 1400;
+      this.hp = 1400;
+      this.speed = 0.75;
+      this.damage = 55;
+      this.color = '#3b82f6';
+      this.darkColor = '#1d4ed8';
     }
   }
 
-  takeDamage(amount, fromX, audio, particles, floatTexts, isCrit = false, isSlow = false) {
+  takeDamage(amount, fromX, audio, particles, floatTexts, isCrit = false) {
     this.hp -= amount;
     this.hurtTimer = 6;
 
-    if (isSlow) {
-      this.slowTimer = 60;
-    }
-
     if (audio) audio.playHitMonster();
 
-    // Damage text
-    const txtColor = isCrit ? '#f97316' : (isSlow ? '#38bdf8' : '#ffffff');
     if (floatTexts) {
-      floatTexts.push(new SmoothFloatingText(this.x, this.y - this.radius - 8, `${Math.round(amount)}`, txtColor, isCrit));
+      floatTexts.push(new SmoothFloatingText(this.x, this.y - this.radius - 8, `${Math.round(amount)}`, isCrit ? '#f97316' : '#ffffff', isCrit));
     }
 
-    // Blood / gore particles
-    for (let i = 0; i < (isCrit ? 8 : 4); i++) {
+    for (let i = 0; i < (isCrit ? 6 : 3); i++) {
       particles.push(new SmoothParticle(
-        this.x,
-        this.y,
-        (Math.random() - 0.5) * 5,
-        (Math.random() - 0.5) * 5,
+        this.x, this.y,
+        (Math.random() - 0.5) * 4,
+        (Math.random() - 0.5) * 4,
         this.color,
-        isCrit ? 4 : 2.5,
-        25
+        isCrit ? 3.5 : 2,
+        20
       ));
     }
   }
 
-  update(targetHouse, targetTurret, acidSpits, particles, audio) {
+  update(core, robot, particles, audio) {
     if (this.hurtTimer > 0) this.hurtTimer--;
-    if (this.slowTimer > 0) this.slowTimer--;
+    this.animTimer += 0.08;
 
-    const speed = this.slowTimer > 0 ? this.baseSpeed * 0.45 : this.baseSpeed;
-    this.animProgress += speed * 0.08;
+    // Target selection: 60% priority on Energy Core, 40% on Robot
+    const distToCore = Math.hypot(core.x - this.x, core.y - this.y);
+    const distToRobot = Math.hypot(robot.x - this.x, robot.y - this.y);
+    const target = distToRobot < 140 ? robot : core;
 
-    // Target priority: move towards house center or turret
-    const target = (this.x < targetHouse.x) ? targetHouse : targetTurret;
     const dx = target.x - this.x;
     const dy = target.y - this.y;
     const dist = Math.hypot(dx, dy);
 
-    // Spitter behavior: stop at range and shoot acid
-    if (this.type === 'spitter' || this.type === 'boss') {
-      if (this.shootCooldown > 0) this.shootCooldown--;
-      if (dist < 480 && this.shootCooldown <= 0) {
-        this.shootCooldown = this.type === 'boss' ? 50 : 100;
-        const angle = Math.atan2(dy, dx);
-        acidSpits.push(new AcidSpit(
-          this.x + Math.cos(angle) * this.radius,
-          this.y + Math.sin(angle) * this.radius,
-          Math.cos(angle) * 6,
-          Math.sin(angle) * 6,
-          this.damage
-        ));
+    if (dist > 5) {
+      if (this.type === 'bat') {
+        // Fluttering sinusoidal flight pattern
+        const perpX = -dy / dist;
+        const perpY = dx / dist;
+        const wobble = Math.sin(this.animTimer * 2) * 1.2;
+        this.vx = (dx / dist) * this.speed + perpX * wobble;
+        this.vy = (dy / dist) * this.speed + perpY * wobble;
+      } else {
+        this.vx = (dx / dist) * this.speed;
+        this.vy = (dy / dist) * this.speed;
       }
     }
 
-    // Move forward if not close enough
-    if (dist > this.radius + 15) {
-      this.x += (dx / dist) * speed;
-      this.y += (dy / dist) * speed;
+    this.x += this.vx;
+    this.y += this.vy;
+
+    // Contact attack vs Core
+    if (Math.hypot(this.x - core.x, this.y - core.y) < this.radius + core.radius) {
+      core.hp -= this.damage * 0.03;
+    }
+
+    // Contact attack vs Robot
+    if (Math.hypot(this.x - robot.x, this.y - robot.y) < this.radius + 20) {
+      robot.takeDamage(this.damage * 0.03, particles, []);
     }
   }
 
@@ -165,41 +121,89 @@ export class Monster {
     ctx.save();
     ctx.translate(this.x, this.y);
 
-    const wobble = Math.sin(this.animProgress) * 2;
+    const squish = Math.sin(this.animTimer * 2);
 
-    // Shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    // Ground Shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
     ctx.beginPath();
-    ctx.ellipse(0, this.radius + 4, this.radius * 0.9, this.radius * 0.35, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, this.radius + 2, this.radius * 0.9, this.radius * 0.35, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body
-    ctx.fillStyle = this.hurtTimer > 0 ? '#ffffff' : (this.slowTimer > 0 ? '#67e8f9' : this.color);
-    ctx.beginPath();
-    ctx.arc(0, wobble, this.radius, 0, Math.PI * 2);
-    ctx.fill();
+    // Body Fill
+    ctx.fillStyle = this.hurtTimer > 0 ? '#ffffff' : this.color;
 
-    // Inner menacing core / eye / spikes
-    ctx.fillStyle = this.darkColor;
-    ctx.beginPath();
-    ctx.arc(this.radius * 0.3, wobble - 2, this.radius * 0.35, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#fef08a';
-    ctx.beginPath();
-    ctx.arc(this.radius * 0.35, wobble - 2, this.radius * 0.15, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Monster Spikes / limbs
-    ctx.strokeStyle = this.darkColor;
-    ctx.lineWidth = 3;
-    for (let a = 0; a < Math.PI * 2; a += Math.PI / 2) {
-      const legX = Math.cos(a + this.animProgress) * (this.radius + 4);
-      const legY = Math.sin(a + this.animProgress) * (this.radius + 4);
+    if (this.type === 'slime' || this.type === 'king_slime') {
+      // Slime droplet blob
+      const sx = 1 + squish * 0.12;
+      const sy = 1 - squish * 0.12;
       ctx.beginPath();
-      ctx.moveTo(0, wobble);
-      ctx.lineTo(legX, legY);
-      ctx.stroke();
+      ctx.ellipse(0, 0, this.radius * sx, this.radius * sy, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Slime cute Stardew eyes & mouth
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(-this.radius * 0.3, -2, this.radius * 0.15, 0, Math.PI * 2);
+      ctx.arc(this.radius * 0.3, -2, this.radius * 0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye highlights
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-this.radius * 0.3 - 1, -3, this.radius * 0.07, 0, Math.PI * 2);
+      ctx.arc(this.radius * 0.3 - 1, -3, this.radius * 0.07, 0, Math.PI * 2);
+      ctx.fill();
+
+      // King Slime Crown
+      if (this.type === 'king_slime') {
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.moveTo(-18, -this.radius);
+        ctx.lineTo(-12, -this.radius - 16);
+        ctx.lineTo(0, -this.radius - 8);
+        ctx.lineTo(12, -this.radius - 16);
+        ctx.lineTo(18, -this.radius);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#ca8a04';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    } else if (this.type === 'bat') {
+      // Flapping Bat
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Wings
+      const wingY = Math.sin(this.animTimer * 4) * 12;
+      ctx.fillStyle = this.darkColor;
+      ctx.beginPath();
+      ctx.moveTo(-4, 0);
+      ctx.lineTo(-this.radius * 1.5, wingY);
+      ctx.lineTo(-this.radius * 0.8, wingY + 10);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(4, 0);
+      ctx.lineTo(this.radius * 1.5, wingY);
+      ctx.lineTo(this.radius * 0.8, wingY + 10);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      // Golem / Bug
+      ctx.beginPath();
+      ctx.roundRect(-this.radius, -this.radius, this.radius * 2, this.radius * 2, 8);
+      ctx.fill();
+
+      ctx.fillStyle = this.darkColor;
+      ctx.fillRect(-this.radius * 0.6, -this.radius * 0.4, this.radius * 1.2, this.radius * 0.8);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(0, 0, 4, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     ctx.restore();
@@ -207,12 +211,11 @@ export class Monster {
     // Health Bar
     if (this.hp < this.maxHp) {
       const barW = this.radius * 2;
-      const barH = 4;
-      const hpPct = Math.max(0, this.hp / this.maxHp);
+      const pct = Math.max(0, this.hp / this.maxHp);
       ctx.fillStyle = 'rgba(0,0,0,0.6)';
-      ctx.fillRect(this.x - this.radius, this.y - this.radius - 12, barW, barH);
-      ctx.fillStyle = this.type === 'boss' ? '#e11d48' : '#22c55e';
-      ctx.fillRect(this.x - this.radius, this.y - this.radius - 12, barW * hpPct, barH);
+      ctx.fillRect(this.x - this.radius, this.y - this.radius - 8, barW, 4);
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(this.x - this.radius, this.y - this.radius - 8, barW * pct, 4);
     }
   }
 }
