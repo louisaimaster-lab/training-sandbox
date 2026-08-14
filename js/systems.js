@@ -1,181 +1,229 @@
-// Wave management, Shop items, Crafting recipes, and Loot tables
+// Systems: House Health, Survivors, Neighborhood World, CATS Garage & Shop
+import { CHASSIS_TYPES, PARTS_CATALOG, PART_TYPES } from './parts.js';
 
-export const SHOP_ITEMS = [
-  { id: 'potion', name: 'Lesser Healing Potion', cost: 15, desc: 'Restores 40 HP (Press H)', type: 'potion', amount: 1 },
-  { id: 'wood', name: 'Wood Planks (x5)', cost: 10, desc: 'Crafting material', type: 'mat', matKey: 'wood', amount: 5 },
-  { id: 'ironOre', name: 'Iron Ore (x3)', cost: 35, desc: 'Essential metal for weapons & armor', type: 'mat', matKey: 'ironOre', amount: 3 },
-  { id: 'goldOre', name: 'Gold Ore (x2)', cost: 60, desc: 'Precious metal for high-tier gear', type: 'mat', matKey: 'goldOre', amount: 2 },
-  { id: 'fireCore', name: 'Fire Core', cost: 120, desc: 'Infused with hellfire embers', type: 'mat', matKey: 'fireCore', amount: 1 },
-  { id: 'darkShard', name: 'Dark Shard', cost: 150, desc: 'Pulsing with corrupted energy', type: 'mat', matKey: 'darkShard', amount: 1 },
-];
+export class HouseDefense {
+  constructor(x, y, width = 160, height = 140) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.maxHp = 500;
+    this.hp = 500;
+    this.survivors = 3;
+    this.hitTimer = 0;
+  }
 
-export const CRAFTING_RECIPES = [
-  {
-    id: 'sword_iron',
-    name: 'Iron Broadsword',
-    type: 'weapon',
-    cost: { ironOre: 8, wood: 5 },
-    desc: 'Heavy blade with high knockback. (22 Dmg, 5.5 KB)',
-    data: {
-      id: 'sword_iron',
-      name: 'Iron Broadsword',
-      damage: 22,
-      knockback: 5.5,
-      swingSpeed: 16,
-      range: 42,
-      critChance: 0.10,
-      effectColor: '#cbd5e1',
-      special: null
-    }
-  },
-  {
-    id: 'sword_gold',
-    name: 'Gold Longsword',
-    type: 'weapon',
-    cost: { goldOre: 10, wood: 8 },
-    desc: 'Gleaming blade with high critical strike chance. (36 Dmg, 18% Crit)',
-    data: {
-      id: 'sword_gold',
-      name: 'Gold Longsword',
-      damage: 36,
-      knockback: 6.0,
-      swingSpeed: 15,
-      range: 46,
-      critChance: 0.18,
-      effectColor: '#fbbf24',
-      special: null
-    }
-  },
-  {
-    id: 'sword_fire',
-    name: 'Fiery Greatsword',
-    type: 'weapon',
-    cost: { fireCore: 3, ironOre: 6 },
-    desc: 'Massive blazing blade that unleashes fire slashes. (58 Dmg, Fire Aura)',
-    data: {
-      id: 'sword_fire',
-      name: 'Fiery Greatsword',
-      damage: 58,
-      knockback: 7.0,
-      swingSpeed: 19,
-      range: 54,
-      critChance: 0.20,
-      effectColor: '#f97316',
-      special: 'fire'
-    }
-  },
-  {
-    id: 'sword_night',
-    name: "Night's Edge",
-    type: 'weapon',
-    cost: { darkShard: 4, fireCore: 2, goldOre: 6 },
-    desc: 'Ultimate legendary blade imbued with demonic shadows. (88 Dmg, Shadow Arc)',
-    data: {
-      id: 'sword_night',
-      name: "Night's Edge",
-      damage: 88,
-      knockback: 8.5,
-      swingSpeed: 14,
-      range: 62,
-      critChance: 0.25,
-      effectColor: '#c084fc',
-      special: 'dark'
-    }
-  },
-  {
-    id: 'armor_plate',
-    name: 'Knight Plate Armor',
-    type: 'upgrade',
-    cost: { ironOre: 12, goldOre: 4 },
-    desc: 'Reinforced iron plate. Grants +5 Defense & +20 Max HP',
-    apply: (player) => {
-      player.defense += 5;
-      player.maxHp += 20;
-      player.hp = Math.min(player.maxHp, player.hp + 20);
-    }
-  },
-  {
-    id: 'hermes_boots',
-    name: 'Hermes Boots',
-    type: 'upgrade',
-    cost: { goldOre: 8, wood: 10 },
-    desc: 'Wings of Hermes. Increases movement speed by +35%',
-    apply: (player) => {
-      player.speedBonus = 1.35;
-    }
-  },
-  {
-    id: 'cloud_bottle',
-    name: 'Cloud in a Bottle',
-    type: 'upgrade',
-    cost: { darkShard: 2, wood: 8 },
-    desc: 'A cloud trapped inside glass. Grants Double Jump!',
-    apply: (player) => {
-      player.hasDoubleJump = true;
+  takeDamage(amount) {
+    this.hp = Math.max(0, this.hp - amount);
+    this.hitTimer = 10;
+    if (this.hp <= 0 && this.survivors > 0) {
+      this.survivors = 0;
     }
   }
-];
+
+  draw(ctx) {
+    if (this.hitTimer > 0) this.hitTimer--;
+
+    ctx.save();
+    // House Base & Brick Walls
+    ctx.fillStyle = this.hitTimer > 0 ? '#ef4444' : '#e2e8f0';
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+
+    // Roof (Smooth triangular pitched roof)
+    ctx.fillStyle = '#b91c1c';
+    ctx.beginPath();
+    ctx.moveTo(this.x - 15, this.y);
+    ctx.lineTo(this.x + this.width / 2, this.y - 50);
+    ctx.lineTo(this.x + this.width + 15, this.y);
+    ctx.closePath();
+    ctx.fill();
+
+    // Front Door
+    ctx.fillStyle = '#78350f';
+    ctx.fillRect(this.x + this.width / 2 - 16, this.y + this.height - 45, 32, 45);
+    ctx.fillStyle = '#facc15';
+    ctx.beginPath();
+    ctx.arc(this.x + this.width / 2 + 8, this.y + this.height - 22, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Windows with warm cozy indoor light & survivor silhouettes
+    ctx.fillStyle = '#fef08a';
+    ctx.fillRect(this.x + 20, this.y + 30, 36, 36);
+    ctx.fillRect(this.x + this.width - 56, this.y + 30, 36, 36);
+
+    // Window Frames
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(this.x + 20, this.y + 30, 36, 36);
+    ctx.strokeRect(this.x + this.width - 56, this.y + 30, 36, 36);
+
+    // Survivor silhouettes inside
+    if (this.survivors > 0) {
+      ctx.fillStyle = 'rgba(30, 41, 59, 0.7)';
+      ctx.beginPath();
+      ctx.arc(this.x + 38, this.y + 48, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(this.x + this.width - 38, this.y + 48, 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Porch Light
+    const lightGlow = ctx.createRadialGradient(
+      this.x + this.width / 2, this.y + this.height - 55, 5,
+      this.x + this.width / 2, this.y + this.height - 55, 70
+    );
+    lightGlow.addColorStop(0, 'rgba(253, 224, 71, 0.4)');
+    lightGlow.addColorStop(1, 'rgba(253, 224, 71, 0)');
+    ctx.fillStyle = lightGlow;
+    ctx.beginPath();
+    ctx.arc(this.x + this.width / 2, this.y + this.height - 55, 70, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+}
+
+export class NeighborhoodWorld {
+  constructor(width = 1600, height = 900) {
+    this.width = width;
+    this.height = height;
+  }
+
+  draw(ctx, house, turret) {
+    // Night sky gradient
+    const sky = ctx.createLinearGradient(0, 0, 0, this.height);
+    sky.addColorStop(0, '#020617');
+    sky.addColorStop(0.6, '#0f172a');
+    sky.addColorStop(1, '#1e293b');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, this.width, this.height);
+
+    // Distant neighborhood houses silhouettes
+    ctx.fillStyle = '#090d16';
+    for (let x = 40; x < this.width; x += 220) {
+      if (Math.abs(x - house.x) > 180) {
+        ctx.fillRect(x, 480, 140, 100);
+        ctx.beginPath();
+        ctx.moveTo(x - 10, 480);
+        ctx.lineTo(x + 70, 440);
+        ctx.lineTo(x + 150, 480);
+        ctx.fill();
+      }
+    }
+
+    // Asphalt Street & Curbs
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(0, 580, this.width, 320);
+
+    // Front Yard Grass Lawn
+    ctx.fillStyle = '#166534';
+    ctx.fillRect(house.x - 60, 550, house.width + 120, 120);
+
+    // Road dashed center line
+    ctx.strokeStyle = 'rgba(253, 224, 71, 0.5)';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([30, 25]);
+    ctx.beginPath();
+    ctx.moveTo(0, 720);
+    ctx.lineTo(this.width, 720);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Street Light Posts & Glows
+    this.drawStreetLight(ctx, 250, 530);
+    this.drawStreetLight(ctx, 1350, 530);
+
+    // Wooden Perimeter Defense Fence
+    ctx.fillStyle = '#78350f';
+    ctx.strokeStyle = '#451a03';
+    ctx.lineWidth = 2;
+    for (let fx = house.x - 70; fx <= house.x + house.width + 60; fx += 18) {
+      ctx.fillRect(fx, 620, 8, 35);
+      ctx.strokeRect(fx, 620, 8, 35);
+    }
+  }
+
+  drawStreetLight(ctx, x, y) {
+    ctx.save();
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(x, y + 100);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x + 20, y - 20);
+    ctx.stroke();
+
+    // Light bulb
+    ctx.fillStyle = '#fef08a';
+    ctx.beginPath();
+    ctx.arc(x + 20, y - 18, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Street cone light
+    const cone = ctx.createRadialGradient(x + 20, y - 18, 10, x + 20, y + 150, 180);
+    cone.addColorStop(0, 'rgba(254, 240, 138, 0.35)');
+    cone.addColorStop(1, 'rgba(254, 240, 138, 0)');
+    ctx.fillStyle = cone;
+    ctx.beginPath();
+    ctx.arc(x + 20, y + 50, 180, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
 
 export class WaveManager {
   constructor() {
-    this.currentWave = 1;
-    this.state = 'wave'; // 'wave', 'intermission', 'gameover', 'victory'
-    this.enemiesRemainingToSpawn = 0;
+    this.wave = 1;
+    this.state = 'wave'; // 'wave', 'garage', 'victory', 'gameover'
+    this.enemiesSpawned = 0;
+    this.totalToSpawn = 8;
     this.spawnTimer = 0;
-    this.spawnInterval = 80;
-    this.intermissionTimer = 0;
-    this.isWorkstationRound = false;
-    this.craftedItems = new Set();
-    this.startWave(1);
+    this.spawnRate = 90;
+    this.credits = 150;
+    this.partsInventory = [
+      PARTS_CATALOG.find(p => p.id === 'minigun_mk1'),
+      PARTS_CATALOG.find(p => p.id === 'nanite_repair')
+    ];
   }
 
-  startWave(waveNum) {
-    this.currentWave = waveNum;
+  startNextWave() {
+    this.wave++;
     this.state = 'wave';
-    this.isWorkstationRound = (this.currentWave % 3 === 0);
-
-    // Scaling count of zombies
-    this.enemiesRemainingToSpawn = 6 + waveNum * 3;
-    this.spawnInterval = Math.max(35, 80 - waveNum * 4);
-    this.spawnTimer = 20;
+    this.enemiesSpawned = 0;
+    this.totalToSpawn = 8 + this.wave * 4;
+    this.spawnRate = Math.max(30, 90 - this.wave * 5);
+    this.spawnTimer = 30;
   }
 
-  update(enemies, spawnEnemyCallback, audio, floatTexts) {
-    if (this.state === 'wave') {
-      this.spawnTimer--;
-      if (this.spawnTimer <= 0 && this.enemiesRemainingToSpawn > 0) {
-        this.spawnTimer = this.spawnInterval;
-        this.enemiesRemainingToSpawn--;
+  update(monsters, spawnCallback, audio) {
+    if (this.state !== 'wave') return;
 
-        // Determine enemy type based on wave & RNG
-        let type = 'zombie';
-        const roll = Math.random();
+    this.spawnTimer--;
+    if (this.spawnTimer <= 0 && this.enemiesSpawned < this.totalToSpawn) {
+      this.spawnTimer = this.spawnRate;
+      this.enemiesSpawned++;
 
-        if (this.currentWave >= 4 && roll < 0.15 && this.enemiesRemainingToSpawn === 0) {
-          type = 'brute'; // Wave boss
-        } else if (this.currentWave >= 3 && roll < 0.35) {
-          type = 'crawler';
-        } else if (this.currentWave >= 2 && roll < 0.50) {
-          type = 'armored_zombie';
-        }
+      // Enemy type roll
+      let type = 'runner';
+      const roll = Math.random();
 
-        // Spawn left or right
-        const side = Math.random() < 0.5 ? 'left' : 'right';
-        spawnEnemyCallback(type, side);
+      if (this.wave >= 5 && this.enemiesSpawned === this.totalToSpawn) {
+        type = 'boss';
+      } else if (this.wave >= 3 && roll < 0.25) {
+        type = 'brute';
+      } else if (this.wave >= 2 && roll < 0.45) {
+        type = 'spitter';
       }
 
-      // Check if wave is cleared
-      if (this.enemiesRemainingToSpawn === 0 && enemies.length === 0) {
-        this.state = 'intermission';
-        this.intermissionTimer = 1800; // 30 seconds default, can skip with button
-        audio.playWaveHorn();
-      }
+      spawnCallback(type);
     }
-  }
 
-  skipIntermission() {
-    if (this.state === 'intermission') {
-      this.startWave(this.currentWave + 1);
+    // Wave completed
+    if (this.enemiesSpawned >= this.totalToSpawn && monsters.length === 0) {
+      this.state = 'garage';
+      this.credits += 120 + this.wave * 40;
+      if (audio) audio.playSnap();
     }
   }
 }

@@ -3,95 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terraria Arena: Knight's Stand</title>
+  <title>Neighborhood Turret Defense - Modular Arsenal</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="game-wrapper">
-    <!-- Top HUD -->
-    <div id="hud-top">
-      <div class="hud-section" id="hearts-container">
-        <!-- Injected via JS -->
-      </div>
-      <div class="hud-section">
-        <span class="coin-badge">💰 <span id="hud-coins">0</span></span>
-      </div>
-      <div class="hud-section">
-        <span class="wave-badge" id="hud-wave">Wave 1</span>
-        <span id="hud-wave-status" style="font-size: 8.5px; margin-left: 8px;"></span>
-      </div>
-    </div>
+  <!-- Fullscreen Immersive Canvas -->
+  <canvas id="game-canvas"></canvas>
 
-    <!-- Canvas Viewport -->
-    <div id="canvas-container">
-      <canvas id="game-canvas" width="540" height="310"></canvas>
-
-      <!-- Shop Modal Overlay -->
-      <div id="shop-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>🛒 Merchant's Outpost</h2>
-            <button class="close-modal-btn">✕</button>
-          </div>
-          <div id="shop-items-list" class="modal-scroll-list">
-            <!-- Injected via JS -->
-          </div>
+  <!-- In-Game Floating Tactical HUD -->
+  <div id="in-game-hud">
+    <div class="hud-panel hud-top-left">
+      <div class="hud-bar-group">
+        <div class="hud-bar-label">
+          <span>🏡 HOUSE INTEGRITY</span>
+          <span id="hud-house-text">500/500</span>
+        </div>
+        <div class="progress-track">
+          <div id="hud-house-bar" class="progress-fill fill-house" style="width: 100%;"></div>
         </div>
       </div>
 
-      <!-- Crafting Anvil Modal Overlay -->
-      <div id="craft-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>⚒️ Anvil & Workstation</h2>
-            <button class="close-modal-btn">✕</button>
-          </div>
-          <div id="craft-status-banner" style="font-size: 8px; margin-bottom: 8px;"></div>
-          <div id="craft-items-list" class="modal-scroll-list">
-            <!-- Injected via JS -->
-          </div>
+      <div class="hud-bar-group">
+        <div class="hud-bar-label">
+          <span>🛡️ TURRET INTEGRITY</span>
+          <span id="hud-turret-text">200/200</span>
         </div>
-      </div>
-
-      <!-- Game Over Screen -->
-      <div id="gameover-screen" class="modal-overlay hidden">
-        <div class="gameover-box">
-          <h1>YOU DIED</h1>
-          <p>The arena was overwhelmed by the horde.</p>
-          <button id="btn-restart" class="pixel-btn btn-gold">Respawn & Try Again</button>
+        <div class="progress-track">
+          <div id="hud-turret-bar" class="progress-fill fill-turret" style="width: 100%;"></div>
         </div>
       </div>
     </div>
 
-    <!-- Bottom HUD -->
-    <div id="hud-bottom">
-      <div id="hud-materials" class="hud-materials">
-        <!-- Injected via JS -->
+    <div class="hud-panel hud-center">
+      <div class="wave-title" id="hud-wave-title">WAVE 1</div>
+      <div class="wave-sub" id="hud-monsters-left">Infected Remaining: 8</div>
+    </div>
+
+    <div class="hud-panel hud-right">
+      <div class="credit-badge" id="hud-credits-val">$150</div>
+      <div class="survivors-badge">Survivors: <span id="hud-survivors">👨‍👩‍👦</span></div>
+    </div>
+  </div>
+
+  <!-- CATS-Styled Modular Garage Workshop Overlay -->
+  <div id="garage-overlay">
+    <div class="garage-container">
+      <div class="garage-header">
+        <div class="garage-title-wrap">
+          <h1>TURRET ENGINEERING WORKBENCH</h1>
+          <p>Assemble your modular combat platform. Balance Energy budget against firepower.</p>
+        </div>
+        <div class="nav-tabs">
+          <button id="tab-assembly-btn" class="tab-btn active">🔧 Chassis & Assembly</button>
+          <button id="tab-shop-btn" class="tab-btn">🛒 Military Armory</button>
+        </div>
       </div>
-      <div class="hud-actions">
-        <span id="hud-weapon" style="color: #cbd5e1; font-size: 8px; align-self: center; margin-right: 6px;"></span>
-        <button id="btn-heal" class="pixel-btn btn-green">Heal [H]</button>
-        <button id="btn-shop" class="pixel-btn btn-gold">Shop [E]</button>
-        <button id="btn-craft" class="pixel-btn btn-craft-action">Anvil</button>
-        <button id="btn-next-wave" class="pixel-btn btn-gold hidden">Next Wave ⏩</button>
+
+      <!-- Live Dynamic Stats Bar -->
+      <div id="garage-stats-bar">
+        <!-- Injected dynamically via JS -->
+      </div>
+
+      <!-- Assembly Tab Section -->
+      <div id="sec-assembly" class="workbench-grid">
+        <!-- Column 1: Chassis Platforms -->
+        <div class="panel-card">
+          <h3>1. Select Chassis</h3>
+          <div id="chassis-list" class="scroll-container">
+            <!-- Injected dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Column 2: Interactive Sockets Blueprint -->
+        <div class="panel-card">
+          <h3>2. Modular Socket Mounts</h3>
+          <div id="turret-sockets-view" class="sockets-grid">
+            <!-- Injected dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Column 3: Warehouse Parts Inventory -->
+        <div class="panel-card">
+          <h3>3. Parts Warehouse</h3>
+          <div id="inventory-parts-list" class="scroll-container">
+            <!-- Injected dynamically via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Armory Shop Tab Section (Initially hidden) -->
+      <div id="sec-shop" class="workbench-grid hidden" style="grid-template-columns: 1fr;">
+        <div class="panel-card">
+          <h3>Military Hardware Procurement</h3>
+          <div id="armory-shop-list" class="scroll-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;">
+            <!-- Injected dynamically via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Garage Footer -->
+      <div class="garage-footer">
+        <button id="btn-launch-wave" class="btn-launch btn-launch-ready">
+          Deploy Turret ➔ Wave 1
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Controls Guide & Help -->
-  <div id="controls-guide">
-    <div class="guide-col">
-      <p><strong>Movement:</strong> [A] / [D] or Arrow Keys</p>
-      <p><strong>Jump / Double Jump:</strong> [W] / [Space] / Up</p>
-      <p><strong>Drop Through Platforms:</strong> [S] or Down Arrow</p>
-    </div>
-    <div class="guide-col">
-      <p><strong>Attack:</strong> Left Click or Hold</p>
-      <p><strong>Quick Potion:</strong> [H] (Restores 40 HP)</p>
-      <p><strong>Open Shop / Workstation:</strong> [E]</p>
-    </div>
-    <div class="guide-col">
-      <p><strong>Game Loop:</strong> Defeat zombies ➔ Earn coins & materials ➔ Buy goods between rounds ➔ Forge legendary gear at the Anvil every 3 rounds!</p>
+  <!-- Game Over Screen Overlay -->
+  <div id="gameover-overlay" class="hidden">
+    <div class="gameover-box">
+      <h1>DEFENSE FAILED</h1>
+      <p>The neighborhood was breached and the infected overwhelmed the house.</p>
+      <button id="btn-restart" class="btn-restart">Rebuild & Try Again</button>
     </div>
   </div>
 
