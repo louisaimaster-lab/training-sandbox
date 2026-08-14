@@ -1,0 +1,358 @@
+/* Terraria-styled Arena Retro Theme */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen&display=swap');
+
+:root {
+  --bg-dark: #090c15;
+  --panel-bg: rgba(20, 24, 38, 0.95);
+  --panel-border: #475569;
+  --accent-gold: #fbbf24;
+  --accent-red: #ef4444;
+  --accent-green: #22c55e;
+  --accent-blue: #38bdf8;
+  --accent-purple: #c084fc;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  font-family: 'Press Start 2P', monospace, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  padding: 10px;
+}
+
+#game-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  background: #111827;
+  border: 4px solid #374151;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(56, 189, 248, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Top HUD bar */
+#hud-top {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1f2937;
+  border-bottom: 3px solid #374151;
+  padding: 10px 16px;
+  font-size: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hud-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#hearts-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pixel-heart {
+  font-size: 14px;
+  filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.8));
+}
+
+.hp-text {
+  font-size: 10px;
+  color: #f87171;
+  margin-left: 6px;
+}
+
+.coin-badge {
+  color: var(--accent-gold);
+  text-shadow: 1px 1px 0 #000;
+}
+
+.wave-badge {
+  color: var(--accent-blue);
+  background: rgba(56, 189, 248, 0.15);
+  padding: 6px 10px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 4px;
+}
+
+/* Canvas Area */
+#canvas-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 540 / 310;
+  max-height: 560px;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+/* Bottom Controls & Info Bar */
+#hud-bottom {
+  width: 100%;
+  background: #1f2937;
+  border-top: 3px solid #374151;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hud-materials {
+  display: flex;
+  gap: 12px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.hud-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Pixel Buttons */
+.pixel-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  padding: 8px 12px;
+  background: #374151;
+  color: #fff;
+  border: 2px solid #6b7280;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.5), inset 2px 2px 0 rgba(255,255,255,0.2);
+  transition: transform 0.05s, background 0.1s;
+}
+
+.pixel-btn:hover:not(:disabled) {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.pixel-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+.btn-gold {
+  background: #b45309;
+  border-color: #f59e0b;
+  color: #fef08a;
+}
+.btn-gold:hover:not(:disabled) {
+  background: #d97706;
+}
+
+.btn-green {
+  background: #15803d;
+  border-color: #22c55e;
+  color: #bbf7d0;
+}
+.btn-green:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.btn-craft-action {
+  background: #6d28d9;
+  border-color: #a855f7;
+  color: #f3e8ff;
+}
+.btn-craft-action:hover:not(:disabled) {
+  background: #7c3aed;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Modals Overlay (Shop & Crafting) */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background: var(--panel-bg);
+  border: 3px solid var(--panel-border);
+  border-radius: 6px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 85%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.9);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #374151;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.modal-header h2 {
+  font-size: 12px;
+  color: var(--accent-gold);
+}
+
+.close-modal-btn {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.modal-scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.pixel-card {
+  background: #1e293b;
+  border: 2px solid #334155;
+  border-radius: 4px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.pixel-card.disabled {
+  opacity: 0.6;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e2e8f0;
+}
+
+.card-desc {
+  color: var(--text-muted);
+}
+
+.card-costs {
+  font-size: 7.5px;
+}
+
+.coin-price {
+  color: var(--accent-gold);
+}
+
+.recipe-status {
+  font-size: 7.5px;
+  color: var(--accent-purple);
+}
+
+/* Game Over Overlay */
+#gameover-screen {
+  background: rgba(30, 0, 0, 0.88);
+}
+
+.gameover-box {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.gameover-box h1 {
+  font-size: 20px;
+  color: #ef4444;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.gameover-box p {
+  font-size: 9px;
+  color: #cbd5e1;
+}
+
+/* Instructions & Legend */
+#controls-guide {
+  width: 100%;
+  max-width: 960px;
+  margin-top: 14px;
+  background: #111827;
+  border: 2px solid #1f2937;
+  border-radius: 6px;
+  padding: 12px 18px;
+  font-size: 8px;
+  line-height: 1.8;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.guide-col strong {
+  color: var(--accent-blue);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}

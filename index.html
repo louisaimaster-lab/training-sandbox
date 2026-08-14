@@ -3,82 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Games Training Sandbox</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-    .container {
-      max-width: 640px;
-      width: 100%;
-      background: var(--card);
-      border-radius: 12px;
-      padding: 2.5rem;
-      text-align: center;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.75rem;
-      color: var(--accent);
-    }
-    p {
-      color: var(--muted);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      border-radius: 9999px;
-      color: var(--accent);
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-    .indicator {
-      width: 8px;
-      height: 8px;
-      background: #22c55e;
-      border-radius: 50%;
-    }
-    #game-container {
-      margin-top: 2rem;
-    }
-  </style>
+  <title>Terraria Arena: Knight's Stand</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Training Sandbox</h1>
-    <p>Sandbox initialized and deployed. Ready for the first game.</p>
-    <div class="status">
-      <span class="indicator"></span>
-      Ready for Training
+  <div id="game-wrapper">
+    <!-- Top HUD -->
+    <div id="hud-top">
+      <div class="hud-section" id="hearts-container">
+        <!-- Injected via JS -->
+      </div>
+      <div class="hud-section">
+        <span class="coin-badge">💰 <span id="hud-coins">0</span></span>
+      </div>
+      <div class="hud-section">
+        <span class="wave-badge" id="hud-wave">Wave 1</span>
+        <span id="hud-wave-status" style="font-size: 8.5px; margin-left: 8px;"></span>
+      </div>
     </div>
-    <div id="game-container"></div>
+
+    <!-- Canvas Viewport -->
+    <div id="canvas-container">
+      <canvas id="game-canvas" width="540" height="310"></canvas>
+
+      <!-- Shop Modal Overlay -->
+      <div id="shop-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>🛒 Merchant's Outpost</h2>
+            <button class="close-modal-btn">✕</button>
+          </div>
+          <div id="shop-items-list" class="modal-scroll-list">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Crafting Anvil Modal Overlay -->
+      <div id="craft-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>⚒️ Anvil & Workstation</h2>
+            <button class="close-modal-btn">✕</button>
+          </div>
+          <div id="craft-status-banner" style="font-size: 8px; margin-bottom: 8px;"></div>
+          <div id="craft-items-list" class="modal-scroll-list">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Over Screen -->
+      <div id="gameover-screen" class="modal-overlay hidden">
+        <div class="gameover-box">
+          <h1>YOU DIED</h1>
+          <p>The arena was overwhelmed by the horde.</p>
+          <button id="btn-restart" class="pixel-btn btn-gold">Respawn & Try Again</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom HUD -->
+    <div id="hud-bottom">
+      <div id="hud-materials" class="hud-materials">
+        <!-- Injected via JS -->
+      </div>
+      <div class="hud-actions">
+        <span id="hud-weapon" style="color: #cbd5e1; font-size: 8px; align-self: center; margin-right: 6px;"></span>
+        <button id="btn-heal" class="pixel-btn btn-green">Heal [H]</button>
+        <button id="btn-shop" class="pixel-btn btn-gold">Shop [E]</button>
+        <button id="btn-craft" class="pixel-btn btn-craft-action">Anvil</button>
+        <button id="btn-next-wave" class="pixel-btn btn-gold hidden">Next Wave ⏩</button>
+      </div>
+    </div>
   </div>
+
+  <!-- Controls Guide & Help -->
+  <div id="controls-guide">
+    <div class="guide-col">
+      <p><strong>Movement:</strong> [A] / [D] or Arrow Keys</p>
+      <p><strong>Jump / Double Jump:</strong> [W] / [Space] / Up</p>
+      <p><strong>Drop Through Platforms:</strong> [S] or Down Arrow</p>
+    </div>
+    <div class="guide-col">
+      <p><strong>Attack:</strong> Left Click or Hold</p>
+      <p><strong>Quick Potion:</strong> [H] (Restores 40 HP)</p>
+      <p><strong>Open Shop / Workstation:</strong> [E]</p>
+    </div>
+    <div class="guide-col">
+      <p><strong>Game Loop:</strong> Defeat zombies ➔ Earn coins & materials ➔ Buy goods between rounds ➔ Forge legendary gear at the Anvil every 3 rounds!</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
 </body>
 </html>
