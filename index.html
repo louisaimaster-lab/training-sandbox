@@ -3,90 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Neo-Tokyo Skyway Surfer 3D: Overdrive</title>
+  <title>2D Pixel RPG - Heightmap Engine</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Three.js r128 library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-  <!-- Fullscreen WebGL 3D Canvas -->
-  <canvas id="webgl-canvas"></canvas>
+  <!-- Fullscreen Pixelated RPG Canvas -->
+  <canvas id="rpg-canvas"></canvas>
 
-  <!-- Floating Tactical Hazard In-Game HUD -->
-  <div id="in-game-hud">
-    <div class="hazard-card hud-score-box">
-      <div class="hazard-stripes-top"></div>
-      <span class="hud-score-label">DISTANCE SCORE</span>
-      <span class="hud-score-value" id="hud-score-val">0</span>
-      <span class="hud-multiplier" id="hud-mult-val">x2 MULTIPLIER</span>
-    </div>
-
-    <div class="hazard-card hud-coins-box">
-      <div class="hazard-stripes-top"></div>
-      <span class="coin-token-icon">⚡</span>
-      <span class="hud-coins-value" id="hud-coins-val">0</span>
-    </div>
-  </div>
-
-  <!-- Active Power-up Status Indicators -->
-  <div id="hud-powerups-bar"></div>
-
-  <!-- Start Menu Modal (Animated Spring Slide-Down) -->
-  <div id="start-modal" class="menu-modal-overlay">
-    <div class="menu-frame">
-      <div class="hazard-trim-header"></div>
-      <h1 class="menu-title">SKYWAY SURFER: OVERDRIVE</h1>
-      <p class="menu-subtitle">
-        Surf the magnetic floating skyways of Neo-Tokyo. Dodge supersonic maglev trains, slide under lasers, and outrun the Cyber-Enforcer drone!
-      </p>
-
-      <div class="controls-guide-grid">
-        <div class="ctrl-item">
-          <span class="ctrl-key">A / D</span>
-          <span>Switch Lanes</span>
+  <!-- In-Game Floating RPG HUD -->
+  <div id="rpg-hud">
+    <!-- Top Stats & Environment Bar -->
+    <div class="hud-top-bar">
+      <div class="rpg-frame hud-player-stats">
+        <div class="stat-bar-group">
+          <div class="stat-label">
+            <span>❤️ HEALTH</span>
+            <span id="hud-hp-text">100 / 100</span>
+          </div>
+          <div class="pixel-track">
+            <div id="hud-hp-bar" class="pixel-fill fill-hp" style="width: 100%;"></div>
+          </div>
         </div>
-        <div class="ctrl-item">
-          <span class="ctrl-key">W / Space</span>
-          <span>Jump / Train Roof</span>
-        </div>
-        <div class="ctrl-item">
-          <span class="ctrl-key">S / Down</span>
-          <span>Slide / Fast-Drop</span>
-        </div>
-        <div class="ctrl-item">
-          <span class="ctrl-key">Touch</span>
-          <span>Swipe Directions</span>
+
+        <div class="stat-bar-group">
+          <div class="stat-label">
+            <span>⚡ STAMINA</span>
+          </div>
+          <div class="pixel-track">
+            <div id="hud-stamina-bar" class="pixel-fill fill-stamina" style="width: 100%;"></div>
+          </div>
         </div>
       </div>
 
-      <button id="btn-start-run" class="btn-action-chunky">LAUNCH RUN ➔</button>
+      <div class="rpg-frame hud-meta-info">
+        <div class="meta-pill" id="hud-elevation-text">📍 Plateau Farmland (Z:1)</div>
+        <div id="hud-time-text" style="color: #fef08a;">🕒 10:30 AM</div>
+      </div>
+    </div>
+
+    <!-- Bottom 10-Slot Hotbar & Active Weapon Indicator -->
+    <div class="hud-bottom-bar">
+      <div id="active-item-name">Iron Broadsword</div>
+      <div id="hotbar-container">
+        <!-- Injected via JS -->
+      </div>
     </div>
   </div>
 
-  <!-- Game Over Screen Modal (Animated Spring Slide-Down) -->
-  <div id="gameover-modal" class="menu-modal-overlay hidden">
-    <div class="menu-frame">
-      <div class="hazard-trim-header"></div>
-      <h1 class="menu-title" style="color: #ef4444;">WIPEOUT!</h1>
-      <p class="menu-subtitle">You crashed into the skyway barricade and were intercepted.</p>
-
-      <div class="stats-score-summary">
-        <div class="score-stat-col">
-          <span class="score-stat-label">FINAL SCORE</span>
-          <span class="score-stat-val" id="final-score-val">0</span>
-        </div>
-        <div class="score-stat-col">
-          <span class="score-stat-label">NEON COINS</span>
-          <span class="score-stat-val" id="final-coins-val" style="color: #38bdf8;">0</span>
-        </div>
-        <div class="score-stat-col">
-          <span class="score-stat-label">BEST RECORD</span>
-          <span class="score-stat-val" id="final-best-val" style="color: #22c55e;">0</span>
-        </div>
-      </div>
-
-      <button id="btn-restart-run" class="btn-action-chunky">SURF AGAIN ➔</button>
-    </div>
+  <!-- Asset Pipeline Helper Info -->
+  <div id="asset-guide-tag">
+    <strong>🎨 Custom Pixel Art:</strong><br>
+    Drop your <code>.png</code> files into <code>assets/</code><br>
+    Controls: <strong>WASD</strong> Move | <strong>Space/Click</strong> Action | <strong>1-9</strong> Hotbar | <strong>H</strong> Heal
   </div>
 
   <script type="module" src="js/game.js"></script>
